@@ -21,6 +21,9 @@ const { config } = require("dotenv");
 const verifyAdmin = require("./controllers/verifyAdmin");
 const {handleCatagory, handleSubCatagory} = require("./controllers/feature");
 const { addToCart, getCart, emptyCart, removeFromCart } = require("./controllers/cartHandler");
+const { createCartOrder } = require("./controllers/orderController");
+const { addDiliveryDetails } = require("./controllers/delivery");
+const { getAdminPage } = require("./controllers/adminPage");
 config("/.env");
 const port = process.env.PORT;
 // const frontOrigin=process.env.ORIGIN;
@@ -54,9 +57,11 @@ server.post("/user/login", loginHandler);
 server.get("/user/userdetails", isAuthenticated, getUserDetails);
 server.put("/user/edit", isAuthenticated, handleEdit);
 server.delete("/user/delete", isAuthenticated, handleDelete);
+server.put("/user/addDetails",isAuthenticated,addDiliveryDetails)
 //Admin Routes
 // admin route for front-End Verification
 server.get("/user/isAdmin",isAuthenticated,verifyAdmin)
+server.get("/admin/dashboard",isAuthenticated,isAdmin,getAdminPage)
 
 
 // api roustes for Products 
@@ -80,6 +85,10 @@ server.post("/products/addtocart/:productId",isAuthenticated,addToCart)
 server.get("/products/getcart",isAuthenticated,getCart)
 server.get("/products/removeItem/:productId" ,isAuthenticated , removeFromCart)
 server.get("/produts/emptycart" ,isAuthenticated , emptyCart)
+
+// Order Routes 
+
+server.post("/createOrder",isAuthenticated,createCartOrder)
 
 
 server.listen(port, () => {
