@@ -5,16 +5,19 @@ const User = mongoose.model("User", {
   username: String,
   email: String,
   password: String,
-  mobile:Number,
-  fullname:String,
-  street: String,
-  village:String,
-  landmark: String,
-  city: String,
-  state: String,
-  pincode:Number,
+  addresses: [
+    {
+      fullname: String,
+      street: String,
+      city: String,
+      state: String,
+      contact: String,
+      postalCode: String,
+      landMark: String,
+    },
+  ],
   isEmailVerified: Boolean,
-  cartValue: { type : Number},
+  cartValue: { type: Number },
   cart: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
@@ -26,10 +29,11 @@ const User = mongoose.model("User", {
   ],
 
   orders: [
-    { 
-      type: mongoose.Schema.Types.ObjectId, ref: 'Order'  // Reference to Order model
-    }
-  ]
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order", // Reference to Order model
+    },
+  ],
 });
 
 module.exports = User;

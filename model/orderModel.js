@@ -15,13 +15,27 @@ const orderSchema = new mongoose.Schema({
       color: { type: String },
     },
   ],
+  address: [
+    {
+      fullname: String,
+      street: String,
+      city: String,
+      state: String,
+      contact: String,
+      postalCode: String,
+      landMark: String,
+      country: String,
+    },
+  ],
   totalAmount: { type: Number, required: true },
   orderDate: { type: Date, default: Date.now },
   shippingTime: {
     type: Date,
     default: () => new Date(new Date().setDate(new Date().getDate() + 7)),
   },
-  emailVerified: Boolean,
+  isPaymentDone: { type: Boolean, default: false },
+  cancelRequest: { type: Boolean, default: false },
+  refunded: { type: Boolean, default: false },
   status: { type: String, default: "pending" },
 });
 

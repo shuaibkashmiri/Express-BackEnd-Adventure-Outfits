@@ -8,10 +8,11 @@ const {
   getUserDetails,
   handleDelete,
   handleEdit,
+  addressHandler,
 } = require("./controllers/userController");
 const verifyUser = require("./controllers/userVerification");
 
-const {isAuthenticated, isAdmin} = require("./middlewares/auth");
+const { isAuthenticated, isAdmin } = require("./middlewares/auth");
 const multmid = require("./middlewares/multer");
 const {
   handleAddProducts,
@@ -19,9 +20,17 @@ const {
 } = require("./controllers/productContoller");
 const { config } = require("dotenv");
 const verifyAdmin = require("./controllers/verifyAdmin");
-const {handleCatagory, handleSubCatagory} = require("./controllers/feature");
-const { addToCart, getCart, emptyCart, removeFromCart } = require("./controllers/cartHandler");
-const { createCartOrder } = require("./controllers/orderController");
+const { handleCatagory, handleSubCatagory } = require("./controllers/feature");
+const {
+  addToCart,
+  getCart,
+  emptyCart,
+  removeFromCart,
+} = require("./controllers/cartHandler");
+const {
+  createCartOrder,
+  orderAddAddress,
+} = require("./controllers/orderController");
 const { addDiliveryDetails } = require("./controllers/delivery");
 const { getAdminPage } = require("./controllers/adminPage");
 config("/.env");
@@ -29,14 +38,14 @@ const port = process.env.PORT;
 // const frontOrigin=process.env.ORIGIN;
 const server = express();
 
-
-
 //  MiddleWares
-server.use(cors({
-  origin: 'http://localhost:3000',  
-  // origin:"https://adventure-outfits-shuaibkashmiris-projects.vercel.app",
-  credentials: true  
-})); /* Middle ware  (used to monitor incoming and outgoing data)*/
+server.use(
+  cors({
+    origin: "http://localhost:3000",
+    // origin:"https://adventure-outfits-shuaibkashmiris-projects.vercel.app",
+    credentials: true,
+  })
+); /* Middle ware  (used to monitor incoming and outgoing data)*/
 server.use(express.json());
 server.use(cookie());
 
@@ -57,39 +66,55 @@ server.post("/user/login", loginHandler);
 server.get("/user/userdetails", isAuthenticated, getUserDetails);
 server.put("/user/edit", isAuthenticated, handleEdit);
 server.delete("/user/delete", isAuthenticated, handleDelete);
-server.put("/user/addDetails",isAuthenticated,addDiliveryDetails)
+server.post("/user/address/:userId/:orderId", isAuthenticated, addressHandler);
 //Admin Routes
 // admin route for front-End Verification
-server.get("/user/isAdmin",isAuthenticated,verifyAdmin)
-server.get("/admin/dashboard",isAuthenticated,isAdmin,getAdminPage)
+server.get("/user/isAdmin", isAuthenticated, verifyAdmin);
+server.get("/admin/dashboard", isAuthenticated, isAdmin, getAdminPage);
 
+// api roustes for Products
 
-// api roustes for Products 
-
-server.post("/products/add", isAuthenticated,isAdmin, multmid, handleAddProducts);
-server.get("/products/getAll",getProducts);
+server.post(
+  "/products/add",
+  isAuthenticated,
+  isAdmin,
+  multmid,
+  handleAddProducts
+);
+server.get("/products/getAll", getProducts);
 //catagory
-server.get("/products/men",(req,res)=>{handleCatagory(req,res,"Men")})
-server.get("/products/women",(req,res)=>{handleCatagory(req,res,"Women")})
+server.get("/products/men", (req, res) => {
+  handleCatagory(req, res, "Men");
+});
+server.get("/products/women", (req, res) => {
+  handleCatagory(req, res, "Women");
+});
 //Sub Catagory
-server.get("/products/shoes",(req,res)=>handleSubCatagory(req,res,"Shoes"))
-server.get("/products/jackets",(req,res)=>handleSubCatagory(req,res,"Waterproof Jackets"))
-server.get("/products/tops",(req,res)=>handleSubCatagory(req,res,"Top"))
-server.get("/products/pants",(req,res)=>handleSubCatagory(req,res,"Pant"))
-server.get("/products/accessories",(req,res)=>handleSubCatagory(req,res,"Accessories"))
-
+server.get("/products/shoes", (req, res) =>
+  handleSubCatagory(req, res, "Shoes")
+);
+server.get("/products/jackets", (req, res) =>
+  handleSubCatagory(req, res, "Waterproof Jackets")
+);
+server.get("/products/tops", (req, res) => handleSubCatagory(req, res, "Top"));
+server.get("/products/pants", (req, res) =>
+  handleSubCatagory(req, res, "Pant")
+);
+server.get("/products/accessories", (req, res) =>
+  handleSubCatagory(req, res, "Accessories")
+);
 
 // Cart Routes
 
-server.post("/products/addtocart/:productId",isAuthenticated,addToCart)
-server.get("/products/getcart",isAuthenticated,getCart)
-server.get("/products/removeItem/:productId" ,isAuthenticated , removeFromCart)
-server.get("/produts/emptycart" ,isAuthenticated , emptyCart)
+server.post("/products/addtocart/:productId", isAuthenticated, addToCart);
+server.get("/products/getcart", isAuthenticated, getCart);
+server.get("/products/removeItem/:productId", isAuthenticated, removeFromCart);
+server.get("/produts/emptycart", isAuthenticated, emptyCart);
 
-// Order Routes 
+// Order Routes
 
-server.post("/createOrder",isAuthenticated,createCartOrder)
-
+server.post("/createOrder", isAuthenticated, createCartOrder);
+server.get("/order/addAddress/:orderId", isAuthenticated, orderAddAddress);
 
 server.listen(port, () => {
   console.log(`Server is listening on port ${port} `);

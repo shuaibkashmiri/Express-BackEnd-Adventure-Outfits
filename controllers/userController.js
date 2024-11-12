@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const User = require("../model/userModel");
 const { messageHandler } = require("../utils/utils");
 const jwt = require("jsonwebtoken");
-const transporter = require("../utils/nodeMailer")
+const transporter = require("../utils/nodeMailer");
 const { config } = require("dotenv");
 config("/.env");
 const secretKey = process.env.SECRET_KEY;
@@ -10,35 +10,39 @@ const secretKey = process.env.SECRET_KEY;
 const signUpHandler = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    if((!username||username==="")&&(!email||email ==="")&&(!password||password==="")){
-      return messageHandler(res,306,"All Credentials Required")
+    if (
+      (!username || username === "") &&
+      (!email || email === "") &&
+      (!password || password === "")
+    ) {
+      return messageHandler(res, 306, "All Credentials Required");
     }
-    const existingUser =await User.findOne({email});
-    if(existingUser){
-      return messageHandler(res,306,"User Already Registered");
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return messageHandler(res, 306, "User Already Registered");
     }
-    const hashPass =await bcrypt.hash(password,10);
-    const newUser=await User.create({
-      username,email,password:hashPass
-    })
-    if(newUser){
-      const baseUrl = "https://app-back-end-nm7b.onrender.com"
+    const hashPass = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashPass,
+    });
+    if (newUser) {
+      const baseUrl = "https://app-back-end-nm7b.onrender.com";
       const link = `${baseUrl}/verify/email/${newUser._id}`;
       const data = `Your account has been registered with Us ... kindly click on the below link    ${link} to actiavte your account  and confirm you Email`;
 
-     const mail =  await transporter.sendMail({
+      const mail = await transporter.sendMail({
         from: "advicetechkmr@gmail.com",
         to: `${email}`,
         subject: `Welecome ${username}`,
         text: data,
       });
 
-      if(newUser&&mail){
-          return messageHandler(res,201,"User Registered Sucessfully")
+      if (newUser && mail) {
+        return messageHandler(res, 201, "User Registered Sucessfully");
       }
-
     }
-
   } catch (error) {
     console.log("Something wrong with server");
   }
@@ -135,24 +139,80 @@ const handleEdit = async (req, res) => {
   }
 };
 
+//Verify User
 
-//Verify User 
-
-const verifyEmail=async(req,res)=>{
+const verifyEmail = async (req, res) => {
   try {
-    const _id=req.params;
-    const user=await User.findById(_id);
-    if(user){
-      await User.findByIdAndUpdate(_id,{
-        isEmailVerified:true
-      })
-      res.render("index",{title : "Adventure Outfits | Verify"})
+    const _id = req.params;
+    const user = await User.findById(_id);
+    if (user) {
+      await User.findByIdAndUpdate(_id, {
+        isEmailVerified: true,
+      });
+      res.render("index", { title: "Adventure Outfits | Verify" });
     }
-    
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
+
+const addressHandler = async (req, res) => {
+  const { userId, orderId } = req.params;
+  const {
+    fullname,
+    street,
+    city,
+    state,
+    contact,
+    postalCode,
+    landMark,
+  } = req.body;
+
+  const credentials = {
+    contact,
+    fullname,
+    street,
+    landMark,
+    city,
+    state,
+    postalCode,
+  };
+
+  const someEmpty = Object.values(credentials).some((value) => !value);
+  if (someEmpty) {
+    return res.status(206).json({ message: "All credentails required" });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          addresses: [
+            {
+              fullname,
+              street,
+              city,
+              state,
+              contact,
+              postalCode,
+              landMark,
+            },
+          ],
+        },
+      },
+      { new: true } // Return the updated user document
+    );
+
+    if (!updatedUser) {
+      return messageHandler(res, 200, "some Error");
+    }
+    res.status(201).json({ message: "Proceeding to checkout", orderId });
+  } catch (error) {
+    console.log(error);
+    res.render("cart", { message: "Some Error " });
+  }
+};
 
 module.exports = {
   signUpHandler,
@@ -160,4 +220,5 @@ module.exports = {
   getUserDetails,
   handleDelete,
   handleEdit,
+  addressHandler,
 };
