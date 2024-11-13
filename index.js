@@ -33,6 +33,11 @@ const {
 } = require("./controllers/orderController");
 const { addDiliveryDetails } = require("./controllers/delivery");
 const { getAdminPage } = require("./controllers/adminPage");
+const {
+  checkout,
+  createIntent,
+  paymentSuccess,
+} = require("./controllers/payment");
 config("/.env");
 const port = process.env.PORT;
 // const frontOrigin=process.env.ORIGIN;
@@ -115,6 +120,9 @@ server.get("/produts/emptycart", isAuthenticated, emptyCart);
 
 server.post("/createOrder", isAuthenticated, createCartOrder);
 server.get("/order/addAddress/:orderId", isAuthenticated, orderAddAddress);
+server.get("/order/checkout/:orderId", isAuthenticated, checkout);
+server.post("/order/paymentIntent", isAuthenticated, createIntent); //api for payment intent
+server.get("/order/payment/success/:orderId", isAuthenticated, paymentSuccess);
 
 server.listen(port, () => {
   console.log(`Server is listening on port ${port} `);
