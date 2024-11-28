@@ -55,7 +55,6 @@ const loginHandler = async (req, res) => {
     if (email === "" || password === "") {
       return messageHandler(res, 203, "All credentails Required!");
     }
-
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
@@ -80,19 +79,32 @@ const loginHandler = async (req, res) => {
     console.log(error);
   }
 };
-
 const getUserDetails = async (req, res) => {
   try {
     const _id = req.user;
     if (_id) {
-      const getUser = await User.findById(_id);
+      // Fetch the user and populate the 'orders' field with order details
+      const getUser = await User.findById(_id)
+        .populate({
+          path: "orders", // Populate the orders of the user
+          populate: {
+            // Populate the products within each order
+            path: "products.productId", // Assuming the 'products' array in the order contains 'product' references
+            model: "Product", // Specify the Product model to populate product details
+          },
+        })
+        .exec();
+
       messageHandler(res, 200, {
-        msg: "User Fetched SucessFully",
+        msg: "User Fetched Successfully",
         userdetails: getUser,
       });
     }
   } catch (error) {
     console.log(error);
+    messageHandler(res, 500, {
+      msg: "Internal server error",
+    });
   }
 };
 

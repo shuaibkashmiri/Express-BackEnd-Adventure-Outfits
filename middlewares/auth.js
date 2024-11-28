@@ -21,19 +21,17 @@ const isAuthenticated = (req, res, next) => {
   }
 };
 
-const isAdmin = async(req,res,next)=>{
-  
+const isAdmin = async (req, res, next) => {
   try {
-    const id=req.user
-  const userEmail=process.env.ADMIN_EMAIL;
-    const findAdmin=await User.findById(id);
-  if(findAdmin.email !==userEmail){
-    return messageHandler(res,206,"UnAuthorised")
-  }
-   return next()
-    
+    const id = req.user;
+    const userEmail = process.env.ADMIN_EMAIL;
+    const findAdmin = await User.findById(id);
+    if (findAdmin.email !== userEmail) {
+      return messageHandler(res, 206, "UnAuthorised");
+    }
+    return next();
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
-module.exports = {isAuthenticated,isAdmin};
+};
+module.exports = { isAuthenticated, isAdmin };

@@ -1,29 +1,54 @@
-const User =require("../model/userModel")
+const User = require("../model/userModel");
 
-const addDiliveryDetails=async (req,res)=>{
-    try {
-        const userId=req.user;
-        const {mobile,fullname,street,landmark,village,city,state,pincode,}=req.body;
-        const credentials={mobile,fullname,street,landmark,village,city,state,pincode,};
+const addDiliveryDetails = async (req, res) => {
+  try {
+    const userId = req.user;
+    const {
+      contact,
+      fullname,
+      street,
+      landmark,
+      village,
+      city,
+      state,
+      pincode,
+    } = req.body;
 
-        const someEmpty = Object.values(credentials).some(value => !value);
+    // Ensure all required fields are present
+    const credentials = {
+      contact,
+      fullname,
+      street,
+      landmark,
+      village,
+      city,
+      state,
+      pincode,
+    };
+    const someEmpty = Object.values(credentials).some((value) => !value);
 
-        if(someEmpty){
-            return res.status(206).json({message:"All credentails required"})
-        }
-
-        const user=await User.findByIdAndUpdate(userId,{mobile,fullname,street,landmark,village,city,state,pincode})
-
-        if(user){
-            res.status(200).json({message:"Delivery Details Updated"})
-        }else{
-            res.status(400)
-        }
-      
-        
-    } catch (error) {
-        console.log(error)
+    if (someEmpty) {
+      return res.status(206).json({ message: "All credentials required" });
     }
-}
 
-module.exports={addDiliveryDetails}
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Push the new address to the addresses array
+    user.addresses.push(credentials);
+
+    // Save the updated user document
+    await user.save();
+
+    // Return success response
+    res.status(200).json({ message: "Delivery details updated" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { addDiliveryDetails };

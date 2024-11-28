@@ -72,6 +72,7 @@ server.get("/user/userdetails", isAuthenticated, getUserDetails);
 server.put("/user/edit", isAuthenticated, handleEdit);
 server.delete("/user/delete", isAuthenticated, handleDelete);
 server.post("/user/address/:userId/:orderId", isAuthenticated, addressHandler);
+server.put("/user/addDetails", isAuthenticated, addDiliveryDetails);
 //Admin Routes
 // admin route for front-End Verification
 server.get("/user/isAdmin", isAuthenticated, verifyAdmin);
