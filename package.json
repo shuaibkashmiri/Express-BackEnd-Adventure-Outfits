@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon /index.js",
-    "server": "node index.js",
+    "start": "node index.js",
     "client": "npm start --prefix ../firstReactApp",
     "both": "concurrently \"npm run dev\" \"npm run client\""
   },
