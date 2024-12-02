@@ -46,8 +46,8 @@ const server = express();
 //  MiddleWares
 server.use(
   cors({
-   // origin: "http://localhost:3000",
-     origin:"https://adventure-outfits-shuaibkashmiris-projects.vercel.app",
+    // origin: "http://localhost:3000",
+    origin: "https://adventure-outfits-shuaibkashmiris-projects.vercel.app",
     credentials: true,
   })
 ); /* Middle ware  (used to monitor incoming and outgoing data)*/
@@ -121,9 +121,9 @@ server.get("/produts/emptycart", isAuthenticated, emptyCart);
 
 server.post("/createOrder", isAuthenticated, createCartOrder);
 server.get("/order/addAddress/:orderId", isAuthenticated, orderAddAddress);
-server.get("/order/checkout/:orderId", isAuthenticated, checkout);
-server.post("/order/paymentIntent", isAuthenticated, createIntent); //api for payment intent
-server.get("/order/payment/success/:orderId", isAuthenticated, paymentSuccess);
+// server.get("/order/checkout/:orderId", isAuthenticated, checkout);
+// server.post("/order/paymentIntent", isAuthenticated, createIntent); //api for payment intent
+// server.get("/order/payment/success/:orderId", isAuthenticated, paymentSuccess);
 
 server.listen(port, () => {
   console.log(`Server is listening on port ${port} `);
