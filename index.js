@@ -44,13 +44,23 @@ const port = process.env.PORT;
 const server = express();
 
 //  MiddleWares
+
 server.use(
   cors({
-    // origin: "http://localhost:3000",
-    origin: "https://adventure-outfits-shuaibkashmiris-projects.vercel.app",
+    origin: [
+      "http://localhost:3000",
+      "https://adventure-outfits-shuaibkashmiris-projects.vercel.app",
+    ],
     credentials: true,
   })
-); /* Middle ware  (used to monitor incoming and outgoing data)*/
+);
+// server.use(
+//   cors({
+//     // origin: "http://localhost:3000",
+//     origin: "https://adventure-outfits-shuaibkashmiris-projects.vercel.app",
+//     credentials: true,
+//   })
+// ); /* Middle ware  (used to monitor incoming and outgoing data)*/
 server.use(express.json());
 server.use(cookie());
 
