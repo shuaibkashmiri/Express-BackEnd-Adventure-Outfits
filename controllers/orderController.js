@@ -81,6 +81,60 @@ const deleteorder = async (req, res) => {
   }
 };
 
+//Admin changes Status of order
+const changeOrderStatus = async (req, res) => {
+  try {
+    const { orderId, userId } = req.params;
+    const { status } = req.body;
+
+    // Ensure the 'status' is a string
+    if (typeof status !== "string") {
+      return res
+        .status(400)
+        .send("Invalid status value. Status should be a string.");
+    }
+
+    // Step 1: Update the order status in the Order model
+    const updateOrder = await Order.findByIdAndUpdate(
+      orderId, // Find the order by its ID
+      { status: status }, // Set the new status
+      { new: true } // Return the updated document
+    );
+
+    if (!updateOrder) {
+      return res.status(404).send("Order not found");
+    }
+
+    // Step 2: Update the user's order reference status
+    const updateUser = await User.findById(userId);
+
+    if (!updateUser) {
+      return res.status(404).send("User not found");
+    }
+
+    // Find the order in the user's orders array and update its status
+    const orderIndex = updateUser.orders.findIndex(
+      (order) => order.toString() === orderId
+    );
+
+    if (orderIndex !== -1) {
+      // Update the status of the found order
+      updateUser.orders[orderIndex].status = status;
+
+      // Save the updated user document
+      await updateUser.save();
+    } else {
+      return res.status(404).send("Order not found in user's orders");
+    }
+
+    // Step 3: Send a success message
+    return messageHandler(res, 201, "Order Status Updated");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Server error");
+  }
+};
+
 // confirm order  with updated addresss
 const orderAddAddress = async (req, res) => {
   const { orderId } = req.params;
@@ -105,4 +159,9 @@ const orderAddAddress = async (req, res) => {
   }
 };
 
-module.exports = { createCartOrder, deleteorder, orderAddAddress };
+module.exports = {
+  createCartOrder,
+  deleteorder,
+  orderAddAddress,
+  changeOrderStatus,
+};

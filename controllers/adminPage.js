@@ -4,7 +4,7 @@ const User = require("../model/userModel");
 
 const getAdminPage = async (req, res) => {
   try {
-    const products = await Product.find().lean();
+    const products = await Product.find();
 
     // console.log(products)
 
@@ -17,7 +17,6 @@ const getAdminPage = async (req, res) => {
         path: "orders",
         select: "totalAmount",
       });
-      
 
     const orders = await Order.find()
       .populate({
@@ -40,4 +39,4 @@ const getAdminPage = async (req, res) => {
   }
 };
 
-module.exports={getAdminPage}
+module.exports = { getAdminPage };

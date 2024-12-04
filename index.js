@@ -30,6 +30,8 @@ const {
 const {
   createCartOrder,
   orderAddAddress,
+  deleteorder,
+  changeOrderStatus,
 } = require("./controllers/orderController");
 const { addDiliveryDetails } = require("./controllers/delivery");
 const { getAdminPage } = require("./controllers/adminPage");
@@ -131,6 +133,13 @@ server.get("/produts/emptycart", isAuthenticated, emptyCart);
 
 server.post("/createOrder", isAuthenticated, createCartOrder);
 server.get("/order/addAddress/:orderId", isAuthenticated, orderAddAddress);
+server.put(
+  "/order/changestatus/:orderId/:userId",
+  isAuthenticated,
+  isAdmin,
+  changeOrderStatus
+);
+server.delete("/order/delete/:orderId", isAuthenticated, isAdmin, deleteorder);
 // server.get("/order/checkout/:orderId", isAuthenticated, checkout);
 // server.post("/order/paymentIntent", isAuthenticated, createIntent); //api for payment intent
 // server.get("/order/payment/success/:orderId", isAuthenticated, paymentSuccess);
